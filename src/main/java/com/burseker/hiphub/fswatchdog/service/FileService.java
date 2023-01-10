@@ -7,6 +7,7 @@ import com.burseker.hiphub.fswatchdog.persistant.models.NonUniqueFile;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -19,7 +20,8 @@ import static com.burseker.hiphub.fswatchdog.utils.PrinterUtils.listToString;
 @Service
 public class FileService {
 
-    private static final String WORKING_PATH_STRING = "D:\\tmp\\testPath";
+    @Value("${watch.files.path}")
+    private String workingPath;
 
     private FileWatcher fileWatcher;
 
@@ -29,8 +31,8 @@ public class FileService {
     @SneakyThrows
     @PostConstruct
     void init(){
-        Path workingPath = Path.of(WORKING_PATH_STRING);
-        if(!Files.isDirectory(workingPath)) throw new IllegalArgumentException("WORKING_PATH_STRING=D:\\tmp\\testPath is not directory");
+        Path workingPath = Path.of(this.workingPath);
+        if(!Files.isDirectory(workingPath)) throw new IllegalArgumentException(String.format("workingPath=%s is not directory", workingPath));
 
         log.info("all files in directory");
         log.info(listToString(new FileIndexer(workingPath).listFiles()));
@@ -58,7 +60,7 @@ public class FileService {
         );
 
         log.info("initialization of FileWatcher service");
-        fileWatcher=new FileWatcher(WORKING_PATH_STRING);
+        fileWatcher=new FileWatcher(this.workingPath);
         //fileWatcher.start();
     }
 }
