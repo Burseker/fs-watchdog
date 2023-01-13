@@ -19,14 +19,14 @@ public class FileIndexer {
     }
 
     @SneakyThrows
-    public List<String> listFiles(){
+    public List<FileMetaInfo> listFiles(){
         RegularFileVisitor fileVisitor = new RegularFileVisitor();
         Files.walkFileTree(workingPath, fileVisitor);
 
         return fileVisitor
                 .getFileMetaList()
                 .stream()
-                .map(PathMetaInfoPrinter::printPathInfo)
+                .map(Path2MetaInfoMapper::map)
                 .collect(Collectors.toList());
     }
 }

@@ -1,16 +1,22 @@
 package com.burseker.hiphub.fswatchdog.persistant.models;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
-public class NonUniqueFile {
+@Table(indexes = {
+        @Index(name = "path_index", columnList = "path", unique = true),
+        @Index(name = "md5_size_index", columnList = "md5, size")
+    }
+)
+public class FileMetaIndex {
     @Id
     @GeneratedValue
     private Long id;
@@ -23,6 +29,9 @@ public class NonUniqueFile {
 
     @Column(nullable = false)
     private Long size;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private FileMetaIndex mainFile;
 
     public Long getId() {
         return id;
@@ -56,26 +65,35 @@ public class NonUniqueFile {
         this.size = size;
     }
 
+    public FileMetaIndex getMainFile() {
+        return mainFile;
+    }
+
+    public void setMainFile(FileMetaIndex mainFile) {
+        this.mainFile = mainFile;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        NonUniqueFile that = (NonUniqueFile) o;
-        return Objects.equals(id, that.id) && Objects.equals(path, that.path) && Objects.equals(md5, that.md5) && Objects.equals(size, that.size);
+        FileMetaIndex that = (FileMetaIndex) o;
+        return Objects.equals(id, that.id) && Objects.equals(path, that.path) && Objects.equals(md5, that.md5) && Objects.equals(size, that.size) && Objects.equals(mainFile, that.mainFile);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, path, md5, size);
+        return Objects.hash(id, path, md5, size, mainFile);
     }
 
     @Override
     public String toString() {
-        return "NonUniqueFile{" +
+        return "FileMetaIndex{" +
                 "id=" + id +
                 ", path='" + path + '\'' +
                 ", md5='" + md5 + '\'' +
                 ", size=" + size +
+                ", mainFile=" + mainFile.getId() +
                 '}';
     }
 }
