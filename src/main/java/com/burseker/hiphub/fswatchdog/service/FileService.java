@@ -33,6 +33,9 @@ public class FileService {
     @Autowired
     private FileMetaIndexRepository repository;
 
+    @Autowired
+    private FileCopyWalker fileCopyWalker;
+
     @SneakyThrows
     @PostConstruct
     void init(){
@@ -45,7 +48,6 @@ public class FileService {
 
         Iterable<FileMetaIndex> res = repository.saveAll(fileMetaInfoList.stream().map(FileMetaInfo2NonUniqueFile::convert).collect(Collectors.toList()));
 
-
         List<FileMetaIndex> some = new ArrayList<>();
         res.forEach(v->{
                 v.setMainFile(v);
@@ -57,5 +59,9 @@ public class FileService {
         log.info("initialization of FileWatcher service");
         fileWatcher=new FileWatcher(this.workingPath);
         //fileWatcher.start();
+    }
+
+    public void walkForCopies(){
+        fileCopyWalker.markRepeating();
     }
 }
