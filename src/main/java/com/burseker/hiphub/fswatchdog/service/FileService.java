@@ -6,6 +6,7 @@ import com.burseker.hiphub.fswatchdog.file_watcher.FileWatcher;
 import com.burseker.hiphub.fswatchdog.persistant.converter.FileMetaInfo2NonUniqueFile;
 import com.burseker.hiphub.fswatchdog.persistant.daos.FileMetaIndexRepository;
 import com.burseker.hiphub.fswatchdog.persistant.models.FileMetaIndex;
+import com.burseker.hiphub.fswatchdog.view.FileWithCopies;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.burseker.hiphub.fswatchdog.utils.PrinterUtils.listToString;
@@ -55,6 +55,9 @@ public class FileService {
             }
         );
         repository.saveAll(res);
+        //TODO Если метод вызывается из этой точки, то алгоритм markRepeating не распознаёт файлы, которые уже
+        //     являются копиями
+        fileCopyWalker.markRepeating();
 
         log.info("initialization of FileWatcher service");
         fileWatcher=new FileWatcher(this.workingPath);
@@ -63,5 +66,45 @@ public class FileService {
 
     public void walkForCopies(){
         fileCopyWalker.markRepeating();
+    }
+
+    public List<FileWithCopies> getAllFiles(){
+        Iterable<FileMetaIndex> res = repository.findAll();
+        List<FileWithCopies> result = new ArrayList<>();
+        res.forEach(val-> result.add(FileWithCopies
+                .builder()
+                .name(val.getPath())
+                .size(val.getSize())
+                .hash(val.getMd5())
+                .build()
+        ));
+        return result;
+    }
+
+    public Collection<FileWithCopies> getFilesWithCopies(){
+        Iterable<FileMetaIndex> res = repository.findAll();
+        Map<Long, FileWithCopies> result = new HashMap<>();
+        res.forEach(val->{
+            if(!Objects.equals(val.getId(), val.getMainFile().getId())){
+                FileWithCopies file = result.computeIfAbsent(val.getMainFile().getId(), k -> FileWithCopies
+                        .builder()
+                        .name(val.getMainFile().getPath())
+                        .size(val.getMainFile().getSize())
+                        .hash(val.getMainFile().getMd5())
+                        .copies(new ArrayList<>())
+                        .build()
+                );
+
+                file.getCopies().add(
+                    FileMetaInfo
+                        .builder()
+                        .name(val.getPath())
+                        .size(val.getSize())
+                        .hash(val.getMd5())
+                        .build()
+                );
+            }
+        });
+        return result.values();
     }
 }

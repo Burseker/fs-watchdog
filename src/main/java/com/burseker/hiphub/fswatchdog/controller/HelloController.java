@@ -1,10 +1,15 @@
 package com.burseker.hiphub.fswatchdog.controller;
 
+import com.burseker.hiphub.fswatchdog.file_indexer.FileMetaInfo;
 import com.burseker.hiphub.fswatchdog.service.FileService;
+import com.burseker.hiphub.fswatchdog.view.FileWithCopies;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -27,5 +32,17 @@ public class HelloController {
         fileService.walkForCopies();
 
         return "someText";
+    }
+
+    @GetMapping("get-all-files")
+    List<FileWithCopies> getAllFiles(){
+        log.info("getAllFiles(). entry");
+        return fileService.getAllFiles();
+    }
+
+    @GetMapping("get-files-with-copies")
+    Collection<FileWithCopies> getFileWithCopies(){
+        log.info("getAllFiles(). entry");
+        return fileService.getFilesWithCopies();
     }
 }

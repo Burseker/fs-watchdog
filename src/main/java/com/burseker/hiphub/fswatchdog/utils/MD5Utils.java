@@ -41,7 +41,7 @@ public class MD5Utils {
         }
 
         try (SeekableByteChannel sbc = Files.newByteChannel(filePath, READ)) {
-            ByteBuffer buff = ByteBuffer.allocate(2048);
+            ByteBuffer buff = ByteBuffer.allocate(262144);
             while(sbc.read(buff) != -1)
             {
                 buff.flip();
