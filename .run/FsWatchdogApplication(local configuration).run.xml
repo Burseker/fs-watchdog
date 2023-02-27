@@ -2,6 +2,7 @@
   <configuration default="false" name="FsWatchdogApplication(local configuration)" type="Application" factoryName="Application">
     <envs>
       <env name="SPRING_CONFIG_LOCATION" value="local/resources/application.properties" />
+      <env name="JAVA_TOOL_OPTIONS" value="-Dfile.encoding=UTF8" />
     </envs>
     <option name="MAIN_CLASS_NAME" value="com.burseker.hiphub.fswatchdog.FsWatchdogApplication" />
     <module name="fs-watchdog.main" />
