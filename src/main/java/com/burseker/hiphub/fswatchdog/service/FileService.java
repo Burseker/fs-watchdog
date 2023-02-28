@@ -1,6 +1,7 @@
 package com.burseker.hiphub.fswatchdog.service;
 
 import com.burseker.hiphub.fswatchdog.file_indexer.FileIndexer;
+import com.burseker.hiphub.fswatchdog.file_indexer.FileIndexerV0;
 import com.burseker.hiphub.fswatchdog.file_indexer.FileMetaInfo;
 import com.burseker.hiphub.fswatchdog.file_watcher.FileWatcher;
 import com.burseker.hiphub.fswatchdog.persistant.converter.FileMetaInfo2NonUniqueFile;
@@ -42,22 +43,26 @@ public class FileService {
         Path workingPath = Path.of(this.workingPath);
         if(!Files.isDirectory(workingPath)) throw new IllegalArgumentException(String.format("workingPath=%s is not directory", workingPath));
 
-        log.info("all files in directory");
-        List<FileMetaInfo> fileMetaInfoList = new FileIndexer(workingPath).listFiles();
-        log.info(listToString(fileMetaInfoList.stream().map(FileMetaInfo::toString).collect(Collectors.toList())));
+//        log.info("all files in directory");
+//        List<FileMetaInfo> fileMetaInfoList = new FileIndexerV0(workingPath).listFiles();
+//        log.info(listToString(fileMetaInfoList.stream().map(FileMetaInfo::toString).collect(Collectors.toList())));
+//
+//        Iterable<FileMetaIndex> res = repository.saveAll(fileMetaInfoList.stream().map(FileMetaInfo2NonUniqueFile::convert).collect(Collectors.toList()));
+//
+//        List<FileMetaIndex> some = new ArrayList<>();
+//        res.forEach(v->{
+//                v.setMainFile(v);
+//                log.info(v.toString());
+//            }
+//        );
+//        repository.saveAll(res);
+        new FileIndexer(repository, workingPath).index();
+        new FileIndexer(repository, Path.of("C:\\projects\\SOFT\\sandbox")).index();
+        new FileIndexer(repository, Path.of("C:\\projects\\SOFT\\personal")).index();
 
-        Iterable<FileMetaIndex> res = repository.saveAll(fileMetaInfoList.stream().map(FileMetaInfo2NonUniqueFile::convert).collect(Collectors.toList()));
-
-        List<FileMetaIndex> some = new ArrayList<>();
-        res.forEach(v->{
-                v.setMainFile(v);
-                log.info(v.toString());
-            }
-        );
-        repository.saveAll(res);
         //TODO Если метод вызывается из этой точки, то алгоритм markRepeating не распознаёт файлы, которые уже
         //     являются копиями
-        fileCopyWalker.markRepeating();
+        //fileCopyWalker.markRepeating();
 
         log.info("initialization of FileWatcher service");
         fileWatcher=new FileWatcher(this.workingPath);

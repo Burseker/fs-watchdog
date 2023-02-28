@@ -11,18 +11,24 @@ import java.nio.file.Path;
 @Slf4j
 public class Path2MetaInfoMapper {
 
-    public static FileMetaInfo map(Path path){
+    private final boolean calculateChecksum;
+
+    public Path2MetaInfoMapper(boolean calculateChecksum) {
+        this.calculateChecksum = calculateChecksum;
+    }
+
+    public FileMetaInfo map(Path path){
         Assert.isTrue(Files.isRegularFile(path), "path isn't regular file");
-        log.info("Maps file {} in FileMetaInfo", path);
+        log.trace("Maps file {} in FileMetaInfo", path);
 
         FileMetaInfo result = FileMetaInfo.builder()
                 .name(path.toFile().getAbsolutePath())
-                .hash(MD5Utils.checksum(path))
+                .hash(calculateChecksum ? MD5Utils.checksum(path) : "null")
                 .size(UnhandledExceptionWrapper.call(()->Files.size(path)))
                 .creationTS(null)
                 .build();
 
-        log.info(result.toString());
+        log.info("FileMetaInfo.map={}",result.toString());
         return result;
     }
 }

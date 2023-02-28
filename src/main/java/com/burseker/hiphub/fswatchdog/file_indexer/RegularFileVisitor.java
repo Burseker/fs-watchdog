@@ -10,6 +10,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.nio.file.FileVisitResult.CONTINUE;
 
@@ -58,5 +60,9 @@ public class RegularFileVisitor extends SimpleFileVisitor<Path> {
 
     public List<Path> getFileMetaList() {
         return Collections.unmodifiableList(fileMetaList);
+    }
+
+    public Set<Path> getFileNamesSet() {
+        return fileMetaList.stream().collect(Collectors.toUnmodifiableSet());
     }
 }
