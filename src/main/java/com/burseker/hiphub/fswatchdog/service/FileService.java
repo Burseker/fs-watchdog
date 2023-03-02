@@ -1,10 +1,8 @@
 package com.burseker.hiphub.fswatchdog.service;
 
 import com.burseker.hiphub.fswatchdog.file_indexer.FileIndexer;
-import com.burseker.hiphub.fswatchdog.file_indexer.FileIndexerV0;
 import com.burseker.hiphub.fswatchdog.file_indexer.FileMetaInfo;
 import com.burseker.hiphub.fswatchdog.file_watcher.FileWatcher;
-import com.burseker.hiphub.fswatchdog.persistant.converter.FileMetaInfo2NonUniqueFile;
 import com.burseker.hiphub.fswatchdog.persistant.daos.FileMetaIndexRepository;
 import com.burseker.hiphub.fswatchdog.persistant.models.FileMetaIndex;
 import com.burseker.hiphub.fswatchdog.view.FileWithCopies;
@@ -18,9 +16,6 @@ import javax.annotation.PostConstruct;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
-
-import static com.burseker.hiphub.fswatchdog.utils.PrinterUtils.listToString;
 
 @Slf4j
 @Service
@@ -45,7 +40,7 @@ public class FileService {
 
 //        log.info("all files in directory");
 //        List<FileMetaInfo> fileMetaInfoList = new FileIndexerV0(workingPath).listFiles();
-//        log.info(listToString(fileMetaInfoList.stream().map(FileMetaInfo::toString).collect(Collectors.toList())));
+//        listToString(fileMetaInfoList.stream().map(FileMetaInfo::toString).collect(Collectors.toList())));
 //
 //        Iterable<FileMetaIndex> res = repository.saveAll(fileMetaInfoList.stream().map(FileMetaInfo2NonUniqueFile::convert).collect(Collectors.toList()));
 //
@@ -57,12 +52,12 @@ public class FileService {
 //        );
 //        repository.saveAll(res);
         new FileIndexer(repository, workingPath).index();
-        new FileIndexer(repository, Path.of("C:\\projects\\SOFT\\sandbox")).index();
-        new FileIndexer(repository, Path.of("C:\\projects\\SOFT\\personal")).index();
+        //new FileIndexer(repository, Path.of("C:\\projects\\SOFT\\sandbox")).index();
+        //new FileIndexer(repository, Path.of("C:\\projects\\SOFT\\personal")).index();
 
         //TODO Если метод вызывается из этой точки, то алгоритм markRepeating не распознаёт файлы, которые уже
         //     являются копиями
-        //fileCopyWalker.markRepeating();
+        fileCopyWalker.markCopyKeys();
 
         log.info("initialization of FileWatcher service");
         fileWatcher=new FileWatcher(this.workingPath);

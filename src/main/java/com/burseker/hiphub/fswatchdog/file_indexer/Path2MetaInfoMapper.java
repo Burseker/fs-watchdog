@@ -8,6 +8,8 @@ import org.springframework.util.Assert;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static com.burseker.hiphub.fswatchdog.persistant.models.FileMetaIndex.NULL_HASH;
+
 @Slf4j
 public class Path2MetaInfoMapper {
 
@@ -23,12 +25,12 @@ public class Path2MetaInfoMapper {
 
         FileMetaInfo result = FileMetaInfo.builder()
                 .name(path.toFile().getAbsolutePath())
-                .hash(calculateChecksum ? MD5Utils.checksum(path) : "null")
+                .hash(calculateChecksum ? MD5Utils.checksum(path) : NULL_HASH)
                 .size(UnhandledExceptionWrapper.call(()->Files.size(path)))
                 .creationTS(null)
                 .build();
 
-        log.info("FileMetaInfo.map={}",result.toString());
+        log.debug("FileMetaInfo.map={}",result.toString());
         return result;
     }
 }

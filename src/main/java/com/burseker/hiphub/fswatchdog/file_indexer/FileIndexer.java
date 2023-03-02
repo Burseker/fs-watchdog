@@ -9,6 +9,7 @@ import org.springframework.lang.NonNull;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,7 +33,9 @@ public class FileIndexer {
 
     public void index(){
         Set<Path> pathsSet = collectFilePaths();
-        saveIfNotExist(pathsSet);
+        List<FileMetaIndex> ptintableList = new ArrayList<>();
+        saveIfNotExist(pathsSet).forEach(ptintableList::add);
+        log.info(listToString(ptintableList.stream().map(FileMetaIndex::toString).collect(Collectors.toList())));
     }
 
     @SneakyThrows
@@ -48,7 +51,7 @@ public class FileIndexer {
         Iterable<FileMetaIndex> storedPaths = repository.findByPathStartingWith(workingPath.toFile().getAbsolutePath());
         storedPaths.forEach( v -> newPaths.remove(Path.of(v.getPath())) );
 
-        Path2MetaInfoMapper mapper = new Path2MetaInfoMapper(false);
+        Path2MetaInfoMapper mapper = new Path2MetaInfoMapper(true);
         List<FileMetaInfo> metaToStore = newPaths.stream().map(mapper::map).collect(Collectors.toList());
         log.trace(listToString(metaToStore.stream().map(FileMetaInfo::toString).collect(Collectors.toList())));
 

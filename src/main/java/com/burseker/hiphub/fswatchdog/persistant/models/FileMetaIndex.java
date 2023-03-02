@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.Objects;
+import java.util.Optional;
 
 @Entity
 @NoArgsConstructor
@@ -13,10 +14,12 @@ import java.util.Objects;
 @Builder
 @Table(indexes = {
         @Index(name = "path_index", columnList = "path", unique = true),
-        @Index(name = "md5_size_index", columnList = "md5, size")
+        @Index(name = "md5_size_index", columnList = "md5, size"),
+        @Index(name = "copy_key_index", columnList = "copyKey")
     }
 )
 public class FileMetaIndex {
+    public static final String NULL_HASH = "NULL";
     @Id
     @GeneratedValue
     private Long id;
@@ -32,6 +35,9 @@ public class FileMetaIndex {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private FileMetaIndex mainFile;
+
+    @Column(nullable = true)
+    private String copyKey;
 
     public Long getId() {
         return id;
@@ -73,17 +79,25 @@ public class FileMetaIndex {
         this.mainFile = mainFile;
     }
 
+    public String getCopyKey() {
+        return copyKey;
+    }
+
+    public void setCopyKey(String copyKey) {
+        this.copyKey = copyKey;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         FileMetaIndex that = (FileMetaIndex) o;
-        return Objects.equals(id, that.id) && Objects.equals(path, that.path) && Objects.equals(md5, that.md5) && Objects.equals(size, that.size) && Objects.equals(mainFile, that.mainFile);
+        return Objects.equals(id, that.id) && Objects.equals(path, that.path) && Objects.equals(md5, that.md5) && Objects.equals(size, that.size) && Objects.equals(mainFile, that.mainFile) && Objects.equals(copyKey, that.copyKey);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, path, md5, size, mainFile);
+        return Objects.hash(id, path, md5, size, mainFile, copyKey);
     }
 
     @Override
@@ -93,7 +107,8 @@ public class FileMetaIndex {
                 ", path='" + path + '\'' +
                 ", md5='" + md5 + '\'' +
                 ", size=" + size +
-                ", mainFile=" + mainFile.getId() +
+                ", copyKey=" + copyKey +
+                ", mainFile=" + Optional.ofNullable(mainFile).map(v-> v.getId().toString()).orElse("null") +
                 '}';
     }
 }
