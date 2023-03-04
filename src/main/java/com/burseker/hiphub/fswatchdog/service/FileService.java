@@ -16,6 +16,8 @@ import javax.annotation.PostConstruct;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -38,25 +40,10 @@ public class FileService {
         Path workingPath = Path.of(this.workingPath);
         if(!Files.isDirectory(workingPath)) throw new IllegalArgumentException(String.format("workingPath=%s is not directory", workingPath));
 
-//        log.info("all files in directory");
-//        List<FileMetaInfo> fileMetaInfoList = new FileIndexerV0(workingPath).listFiles();
-//        listToString(fileMetaInfoList.stream().map(FileMetaInfo::toString).collect(Collectors.toList())));
-//
-//        Iterable<FileMetaIndex> res = repository.saveAll(fileMetaInfoList.stream().map(FileMetaInfo2NonUniqueFile::convert).collect(Collectors.toList()));
-//
-//        List<FileMetaIndex> some = new ArrayList<>();
-//        res.forEach(v->{
-//                v.setMainFile(v);
-//                log.info(v.toString());
-//            }
-//        );
-//        repository.saveAll(res);
         new FileIndexer(repository, workingPath).index();
-        //new FileIndexer(repository, Path.of("C:\\projects\\SOFT\\sandbox")).index();
-        //new FileIndexer(repository, Path.of("C:\\projects\\SOFT\\personal")).index();
+//        new FileIndexer(repository, Path.of("C:\\projects\\SOFT\\sandbox")).index();
+//        new FileIndexer(repository, Path.of("C:\\projects\\SOFT\\personal")).index();
 
-        //TODO Если метод вызывается из этой точки, то алгоритм markRepeating не распознаёт файлы, которые уже
-        //     являются копиями
         fileCopyWalker.markCopyKeys();
 
         log.info("initialization of FileWatcher service");
@@ -82,29 +69,33 @@ public class FileService {
     }
 
     public Collection<FileWithCopies> getFilesWithCopies(){
-        Iterable<FileMetaIndex> res = repository.findAll();
-        Map<Long, FileWithCopies> result = new HashMap<>();
-        res.forEach(val->{
-            if(!Objects.equals(val.getId(), val.getMainFile().getId())){
-                FileWithCopies file = result.computeIfAbsent(val.getMainFile().getId(), k -> FileWithCopies
-                        .builder()
-                        .name(val.getMainFile().getPath())
-                        .size(val.getMainFile().getSize())
-                        .hash(val.getMainFile().getMd5())
-                        .copies(new ArrayList<>())
-                        .build()
-                );
+        Iterable<FileMetaIndex> res = repository.findAllByCopyKeyNotNull();
+        Map<String, FileWithCopies> result = new HashMap<>();
+        res.forEach(val-> {
+                String key = val.getMd5() + val.getSize() + "-" + val.getCopyKey();
 
-                file.getCopies().add(
-                    FileMetaInfo
+                FileMetaInfo fileMetaInfo = FileMetaInfo
                         .builder()
                         .name(val.getPath())
                         .size(val.getSize())
                         .hash(val.getMd5())
-                        .build()
+                        .build();
+
+                result.compute(key, (k, v) -> {
+                        if (v == null)
+                            return FileWithCopies.builder()
+                                    .name(key)
+                                    .hash(val.getMd5())
+                                    .size(val.getSize())
+                                    .copies(Stream.of(fileMetaInfo).collect(Collectors.toList()))
+                                    .build();
+                        v.getCopies().add(fileMetaInfo);
+                        return v;
+                    }
                 );
             }
-        });
+        );
+
         return result.values();
     }
 }

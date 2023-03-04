@@ -2,10 +2,10 @@ package com.burseker.hiphub.fswatchdog.service;
 
 import com.burseker.hiphub.fswatchdog.persistant.daos.FileMetaIndexRepository;
 import com.burseker.hiphub.fswatchdog.persistant.models.FileMetaIndex;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Named;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 //TODO Добавить в тест контроль вызова события очереди, о том что файл отсутствует
 
+@Slf4j
 @DataJpaTest(showSql=false)
 //@DataJpaTest(properties={
 //        "spring.jpa.show-sql=false"
@@ -74,8 +75,8 @@ class FileCopyWalkerTest {
     })
     void walkerMarkCopyKeysTest(List<ActExp> actExpMetaIndexes) {
 
-        System.out.println("--========= Input of walker.markCopyKeys() =========--");
-        System.out.println(
+        log.info("--========= Input of walker.markCopyKeys() =========--");
+        log.info(
             listToString(
                 repository.saveAll(actExpMetaIndexes.stream().map(v->v.index).collect(Collectors.toList()))
             )
@@ -85,7 +86,7 @@ class FileCopyWalkerTest {
 
         Iterator<ActExp> it = actExpMetaIndexes.iterator();
         repository.findAll().forEach(v-> it.next().index=v);
-        System.out.println("--========= Output actExpMetaIndexes =========--");
+        log.info("--========= Output actExpMetaIndexes =========--");
         printActualExpected(actExpMetaIndexes);
 
         actExpMetaIndexes.forEach(
@@ -94,7 +95,7 @@ class FileCopyWalkerTest {
     }
 
     void printActualExpected(List<ActExp> actExp){
-        System.out.println(
+        log.info(
             listToString(
                 actExp.stream().map(v-> {return v.index + " expected copyKey=" + v.copyKey;}).collect(Collectors.toList())
             )
@@ -304,24 +305,5 @@ class FileCopyWalkerTest {
                                 .collect(Collectors.toList())
                 ))
         );
-    }
-
-
-
-    @Test
-    void markCopyKeys() {
-        repository.saveAll(
-                Stream.of(
-                        FileMetaIndex.builder().path("a").md5("hash_a").size(1L).build()
-                ).collect(Collectors.toList())
-        );
-        Iterable<FileMetaIndex> oneElement = repository.findAll();
-
-        System.out.println("oneElement.hasNext()=" + oneElement.iterator().hasNext() + ", element value=" + oneElement.iterator().next());
-        System.out.println("oneElement.hasNext()=" + oneElement.iterator().hasNext() + ", element value=" + oneElement.iterator().next());
-
-        Iterator<FileMetaIndex> iterator = oneElement.iterator();
-        System.out.println("oneElement.hasNext()=" + iterator.hasNext() + ", element value=" + iterator.next());
-        System.out.println("oneElement.hasNext()=" + iterator.hasNext());
     }
 }

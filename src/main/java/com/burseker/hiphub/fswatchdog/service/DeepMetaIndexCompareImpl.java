@@ -6,6 +6,7 @@ import com.burseker.hiphub.fswatchdog.utils.FileDeepCompare;
 import java.nio.file.Path;
 import java.util.Objects;
 
+
 public class DeepMetaIndexCompareImpl implements DeepMetaIndexCompare{
     @Override
     public boolean compare(FileMetaIndex fileIndex1, FileMetaIndex fileIndex2) {

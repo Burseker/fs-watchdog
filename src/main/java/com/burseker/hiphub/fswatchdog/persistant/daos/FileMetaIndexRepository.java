@@ -6,5 +6,5 @@ import org.springframework.data.repository.CrudRepository;
 public interface FileMetaIndexRepository extends CrudRepository<FileMetaIndex, Long> {
     Iterable<FileMetaIndex> findByPathStartingWith(String path);
     Iterable<FileMetaIndex> findByMd5AndSize(String md5, Long size);
-    Iterable<FileMetaIndex> findByMd5AndSizeAndIdGreaterThan(String md5, Long size, Long Id);
+    Iterable<FileMetaIndex> findAllByCopyKeyNotNull();
 }
