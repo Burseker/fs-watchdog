@@ -29,6 +29,6 @@ public class IterableTest {
         assertTrue(it.hasNext());
         assertEquals(it.next(), "One");
         assertFalse(it.hasNext());
-        assertThrows(NoSuchElementException.class, ()-> it.next());
+        assertThrows(NoSuchElementException.class, it::next);
     }
 }
