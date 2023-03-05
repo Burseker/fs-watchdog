@@ -1,5 +1,6 @@
-package com.burseker.hiphub.fswatchdog.file_indexer;
+package com.burseker.hiphub.fswatchdog.watchdog.core.common;
 
+import com.burseker.hiphub.fswatchdog.persistant.models.FileMetaIndex;
 import com.burseker.hiphub.fswatchdog.utils.MD5Utils;
 import com.burseker.hiphub.fswatchdog.utils.UnhandledExceptionWrapper;
 import lombok.extern.slf4j.Slf4j;
@@ -11,26 +12,23 @@ import java.nio.file.Path;
 import static com.burseker.hiphub.fswatchdog.persistant.models.FileMetaIndex.NULL_HASH;
 
 @Slf4j
-public class Path2MetaInfoMapper {
-
+public class Path2MetaIndexConverter {
     private final boolean calculateChecksum;
-
-    public Path2MetaInfoMapper(boolean calculateChecksum) {
+    public Path2MetaIndexConverter(boolean calculateChecksum) {
         this.calculateChecksum = calculateChecksum;
     }
 
-    public FileMetaInfo map(Path path){
+    public FileMetaIndex map(Path path){
         Assert.isTrue(Files.isRegularFile(path), "path isn't regular file");
         log.trace("Maps file {} in FileMetaInfo", path);
 
-        FileMetaInfo result = FileMetaInfo.builder()
-                .name(path.toFile().getAbsolutePath())
-                .hash(calculateChecksum ? MD5Utils.checksum(path) : NULL_HASH)
-                .size(UnhandledExceptionWrapper.call(()->Files.size(path)))
-                .creationTS(null)
-                .build();
+        FileMetaIndex result = FileMetaIndex.builder()
+            .path(path.toFile().getAbsolutePath())
+            .md5(calculateChecksum ? MD5Utils.checksum(path) : NULL_HASH)
+            .size(UnhandledExceptionWrapper.call(()->Files.size(path)))
+            .build();
 
-        log.debug("FileMetaInfo.map={}",result.toString());
+        log.trace("Return={}",result.toString());
         return result;
     }
 }

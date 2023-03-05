@@ -1,7 +1,7 @@
 package com.burseker.hiphub.fswatchdog.configs;
 
-import com.burseker.hiphub.fswatchdog.service.DeepMetaIndexCompare;
-import com.burseker.hiphub.fswatchdog.service.DeepMetaIndexCompareImpl;
+import com.burseker.hiphub.fswatchdog.watchdog.core.common.DeepMetaIndexCompare;
+import com.burseker.hiphub.fswatchdog.watchdog.core.common.DeepMetaIndexCompareImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

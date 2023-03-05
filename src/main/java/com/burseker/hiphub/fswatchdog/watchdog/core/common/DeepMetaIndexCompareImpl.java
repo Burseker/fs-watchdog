@@ -1,4 +1,4 @@
-package com.burseker.hiphub.fswatchdog.service;
+package com.burseker.hiphub.fswatchdog.watchdog.core.common;
 
 import com.burseker.hiphub.fswatchdog.persistant.models.FileMetaIndex;
 import com.burseker.hiphub.fswatchdog.utils.FileDeepCompare;

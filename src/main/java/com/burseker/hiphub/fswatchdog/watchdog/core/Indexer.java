@@ -1,6 +1,7 @@
-package com.burseker.hiphub.fswatchdog.file_indexer;
+package com.burseker.hiphub.fswatchdog.watchdog.core;
 
-import com.burseker.hiphub.fswatchdog.persistant.converter.FileMetaInfo2NonUniqueFile;
+import com.burseker.hiphub.fswatchdog.watchdog.core.common.Path2MetaIndexConverter;
+import com.burseker.hiphub.fswatchdog.watchdog.core.common.RegularFileVisitor;
 import com.burseker.hiphub.fswatchdog.persistant.daos.FileMetaIndexRepository;
 import com.burseker.hiphub.fswatchdog.persistant.models.FileMetaIndex;
 import lombok.SneakyThrows;
@@ -19,15 +20,14 @@ import static com.burseker.hiphub.fswatchdog.utils.PrinterUtils.listToString;
 import static java.util.Objects.requireNonNull;
 
 @Slf4j
-public class FileIndexer {
-    private final Path workingPath;
+public class Indexer {
     private final FileMetaIndexRepository repository;
+    private final Path workingPath;
 
-
-    public FileIndexer(@NonNull FileMetaIndexRepository repository,
-                       @NonNull Path workingPath) {
+    public Indexer(@NonNull FileMetaIndexRepository repository,
+                   @NonNull String pathToIndex) {
         this.repository = requireNonNull(repository, "repository");
-        this.workingPath = requireNonNull(workingPath, "workingPath");
+        this.workingPath = Path.of(requireNonNull(pathToIndex, "pathToIndex"));
         if(!Files.isDirectory(workingPath)) throw new IllegalArgumentException(String.format("workingPath=%s is not directory", workingPath));
     }
 
@@ -51,10 +51,10 @@ public class FileIndexer {
         Iterable<FileMetaIndex> storedPaths = repository.findByPathStartingWith(workingPath.toFile().getAbsolutePath());
         storedPaths.forEach( v -> newPaths.remove(Path.of(v.getPath())) );
 
-        Path2MetaInfoMapper mapper = new Path2MetaInfoMapper(true);
-        List<FileMetaInfo> metaToStore = newPaths.stream().map(mapper::map).collect(Collectors.toList());
-        log.trace(listToString(metaToStore.stream().map(FileMetaInfo::toString).collect(Collectors.toList())));
+        Path2MetaIndexConverter mapper = new Path2MetaIndexConverter(true);
+        List<FileMetaIndex> metaToStore = newPaths.stream().map(mapper::map).toList();
+        log.trace(listToString(metaToStore));
 
-        return repository.saveAll(metaToStore.stream().map(FileMetaInfo2NonUniqueFile::convert).collect(Collectors.toList()));
+        return repository.saveAll(metaToStore);
     }
 }

@@ -1,8 +1,8 @@
-package com.burseker.hiphub.fswatchdog.service;
+package com.burseker.hiphub.fswatchdog.watchdog.core;
 
 import com.burseker.hiphub.fswatchdog.persistant.daos.FileMetaIndexRepository;
 import com.burseker.hiphub.fswatchdog.persistant.models.FileMetaIndex;
-import com.burseker.hiphub.fswatchdog.utils.FileDeepCompare;
+import com.burseker.hiphub.fswatchdog.watchdog.core.common.DeepMetaIndexCompare;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,47 +13,14 @@ import java.util.*;
 
 @Slf4j
 @Service
-public class FileCopyWalker {
-    private static final String copyKeyNull = null;
-
+public class CopyWalker {
     private final FileMetaIndexRepository repository;
 
     private final DeepMetaIndexCompare comparator;
 
-    public FileCopyWalker(@Autowired FileMetaIndexRepository repository, @Autowired DeepMetaIndexCompare comparator) {
+    public CopyWalker(@Autowired FileMetaIndexRepository repository, @Autowired DeepMetaIndexCompare comparator) {
         this.repository = repository;
         this.comparator = comparator;
-    }
-
-    public void markRepeating(){
-        log.info("markRepeating(). entry point");
-
-        Iterable<FileMetaIndex> res = repository.findAll();
-        Map<Long, FileMetaIndex> corrected = new HashMap<>();
-        res.forEach(
-            val -> {
-
-                if(!corrected.containsKey(val.getId())){
-                    log.info("Element under test: {}", val);
-                    Iterable<FileMetaIndex> same = repository.findByMd5AndSize(val.getMd5(), val.getSize());
-                    same.forEach(
-                        val2 -> {
-                            if(!Objects.equals(val.getId(), val2.getId())) {
-                                if(deepMetaIndexCompare(val, val2)) {
-                                    log.info("    - same element: {}", val2);
-                                    val2.setMainFile(val);
-                                    corrected.put(val2.getId(), val2);
-                                }
-                            }
-                        }
-                    );
-                } else {
-                    log.info("Element under test: {} is copy of entity id={}", val, corrected.get(val.getId()).getMainFile().getId());
-                }
-            }
-        );
-
-        repository.saveAll(corrected.values());
     }
 
     public void markCopyKeys(){
@@ -124,9 +91,9 @@ public class FileCopyWalker {
     }
     private String calculateCopyKey(String candidate, Set<String> ignored){
         if( candidate!= null ) return candidate;
-        Long index = 0L;
+        long index = 0L;
         while(true){
-            if( !ignored.contains(index.toString()) ) return index.toString();
+            if( !ignored.contains(Long.toString(index)) ) return Long.toString(index);
             index=index+1;
         }
     }

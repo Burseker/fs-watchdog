@@ -8,7 +8,7 @@ service
 watchdog
 |--core
 |  |--dto
-|  |  |--FileMetaIndex
+|  |  |--FileMetaIndex  //это сейчас храниться в persistant, возможно так и надо
 |  |
 |  |--indexer           //рекурсивная индексация указанного каталога
 |  |--watcher           //слежка за изменениями файловой системы

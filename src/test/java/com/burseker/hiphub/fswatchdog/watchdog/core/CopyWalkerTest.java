@@ -1,7 +1,8 @@
-package com.burseker.hiphub.fswatchdog.service;
+package com.burseker.hiphub.fswatchdog.watchdog.core;
 
 import com.burseker.hiphub.fswatchdog.persistant.daos.FileMetaIndexRepository;
 import com.burseker.hiphub.fswatchdog.persistant.models.FileMetaIndex;
+import com.burseker.hiphub.fswatchdog.watchdog.core.common.DeepMetaIndexCompare;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,11 +34,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 //@TestPropertySource(properties = {
 //        "spring.jpa.show-sql=false"
 //})
-class FileCopyWalkerTest {
+class CopyWalkerTest {
     @Autowired
     FileMetaIndexRepository repository;
 
-    FileCopyWalker walker;
+    CopyWalker walker;
 
     static class ActExp{
         public ActExp(FileMetaIndex index, @Nullable Integer copyKey) {
@@ -63,7 +64,7 @@ class FileCopyWalkerTest {
 
     @BeforeEach
     void setUp() {
-        walker = new FileCopyWalker(repository, comparator);
+        walker = new CopyWalker(repository, comparator);
     }
 
     @DisplayName("walkerMarkCopyKeysTest with different arguments")
@@ -97,7 +98,7 @@ class FileCopyWalkerTest {
     void printActualExpected(List<ActExp> actExp){
         log.info(
             listToString(
-                actExp.stream().map(v-> {return v.index + " expected copyKey=" + v.copyKey;}).collect(Collectors.toList())
+                actExp.stream().map(v -> v.index + " expected copyKey=" + v.copyKey).collect(Collectors.toList())
             )
         );
     }

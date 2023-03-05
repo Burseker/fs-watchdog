@@ -1,6 +1,5 @@
-package com.burseker.hiphub.fswatchdog.view;
+package com.burseker.hiphub.fswatchdog.watchdog.dto;
 
-import com.burseker.hiphub.fswatchdog.file_indexer.FileMetaInfo;
 import lombok.Builder;
 import lombok.Data;
 
@@ -8,7 +7,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class FileWithCopies {
+public class FileCopies {
     private final String name;
     private final Long size;
     private final String hash;
