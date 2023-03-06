@@ -12,7 +12,6 @@ import java.util.*;
 
 
 @Slf4j
-@Service
 public class CopyWalker {
     private final FileMetaIndexRepository repository;
 

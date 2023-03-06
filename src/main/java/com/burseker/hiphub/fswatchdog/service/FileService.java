@@ -23,30 +23,24 @@ public class FileService {
     @Value("${watch.files.path}")
     private String workingPath;
 
-    private Watcher watcher;
-
     @Autowired
     private FileMetaIndexRepository repository;
 
     @Autowired
+    private Watcher watcher;
+
+    @Autowired
     private CopyWalker copyWalker;
 
+    @Autowired
     private Monitor monitor;
 
     @SneakyThrows
     @PostConstruct
     void init(){
-
         new Indexer(repository, workingPath).index();
 //        new Indexer(repository, "C:\\projects\\SOFT\\sandbox").index();
 //        new Indexer(repository, "C:\\projects\\SOFT\\personal").index();
-
-        copyWalker.markCopyKeys();
-
-        monitor = new Monitor(repository);
-        log.info("initialization of FileWatcher service");
-        watcher =new Watcher(this.workingPath);
-        //fileWatcher.start();
     }
 
     public void walkForCopies(){
