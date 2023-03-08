@@ -1,5 +1,7 @@
 package com.burseker.hiphub.fswatchdog.controller;
 
+import com.burseker.hiphub.fswatchdog.messaging.LongTaskMessage;
+import com.burseker.hiphub.fswatchdog.messaging.MessagingService;
 import com.burseker.hiphub.fswatchdog.service.FileService;
 import com.burseker.hiphub.fswatchdog.watchdog.dto.FileCopies;
 import com.burseker.hiphub.fswatchdog.watchdog.dto.FileMetaInfo;
@@ -15,6 +17,11 @@ import java.util.Collection;
 @Slf4j
 @RestController
 public class HelloController {
+
+    private static long counter = 0L;
+
+    @Autowired
+    private MessagingService messagingService;
 
     @Autowired
     private FileService fileService;
@@ -41,13 +48,14 @@ public class HelloController {
 
     @GetMapping("get-files-with-copies")
     Collection<FileCopies> getFileWithCopies(){
-        log.info("getAllFiles(). entry");
+        log.info("getFileWithCopies(). entry");
         return fileService.getFilesWithCopies();
     }
 
     @GetMapping("test-endpoint")
     String testEndpoint() throws UnsupportedEncodingException {
         log.info("testEndpoint(). entry");
+        messagingService.send(LongTaskMessage.builder().id(counter++).body("test message with some drop time").spendTime(15L).build());
         return "Какая то тестовая строка";
     }
 }
