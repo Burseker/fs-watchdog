@@ -1,4 +1,4 @@
-package com.burseker.hiphub.fswatchdog.messaging;
+package com.burseker.hiphub.fswatchdog.messaging.test;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;

@@ -1,4 +1,4 @@
-package com.burseker.hiphub.fswatchdog.messaging;
+package com.burseker.hiphub.fswatchdog.messaging.test;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

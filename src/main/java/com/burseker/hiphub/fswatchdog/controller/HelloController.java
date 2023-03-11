@@ -1,7 +1,7 @@
 package com.burseker.hiphub.fswatchdog.controller;
 
-import com.burseker.hiphub.fswatchdog.messaging.LongTaskMessage;
-import com.burseker.hiphub.fswatchdog.messaging.MessagingService;
+import com.burseker.hiphub.fswatchdog.messaging.test.LongTaskMessage;
+import com.burseker.hiphub.fswatchdog.messaging.test.MessagingService;
 import com.burseker.hiphub.fswatchdog.service.FileService;
 import com.burseker.hiphub.fswatchdog.watchdog.dto.FileCopies;
 import com.burseker.hiphub.fswatchdog.watchdog.dto.FileMetaInfo;
