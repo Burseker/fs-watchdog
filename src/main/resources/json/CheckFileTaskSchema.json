@@ -1,0 +1,13 @@
+{
+    "title": "CheckFileTask",
+    "type": "object",
+    "properties": {
+        "path": {
+            "type": "string"
+        },
+        "description": {
+            "type": "string"
+        }
+    },
+    "required": ["path"]
+}

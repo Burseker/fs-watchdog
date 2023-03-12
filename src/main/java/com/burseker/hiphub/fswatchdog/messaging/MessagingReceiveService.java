@@ -1,4 +1,4 @@
-package com.burseker.hiphub.fswatchdog.messaging.test;
+package com.burseker.hiphub.fswatchdog.messaging;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jms.annotation.JmsListener;
@@ -10,15 +10,15 @@ import static java.lang.Thread.sleep;
 
 @Slf4j
 @Component
-public class ConsumerService {
+public class MessagingReceiveService {
 
-    @JmsListener(destination = "TEST_QUEUE")
-    public void receiveTextMessage(Message message) throws JMSException {
+    @JmsListener(destination = "TASK")
+    public void receiveTaskMessage(Message message) throws JMSException {
         log.info("Receive text message: " + message );
 
         try {
-            log.info("go to sleep for {} seconds...", message.getSpendTime() );
-            sleep(message.getSpendTime()*1000);
+            log.info("go to sleep for {} seconds...", 5 );
+            sleep(5*1000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

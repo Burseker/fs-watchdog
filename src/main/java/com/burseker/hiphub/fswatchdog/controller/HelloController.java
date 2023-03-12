@@ -1,7 +1,8 @@
 package com.burseker.hiphub.fswatchdog.controller;
 
-import com.burseker.hiphub.fswatchdog.messaging.test.LongTaskMessage;
-import com.burseker.hiphub.fswatchdog.messaging.test.MessagingService;
+import com.burseker.hiphub.fswatchdog.messaging.CheckFileTask;
+import com.burseker.hiphub.fswatchdog.messaging.CheckFileTaskMessage;
+import com.burseker.hiphub.fswatchdog.messaging.MessagingSendService;
 import com.burseker.hiphub.fswatchdog.service.FileService;
 import com.burseker.hiphub.fswatchdog.watchdog.dto.FileCopies;
 import com.burseker.hiphub.fswatchdog.watchdog.dto.FileMetaInfo;
@@ -21,7 +22,7 @@ public class HelloController {
     private static long counter = 0L;
 
     @Autowired
-    private MessagingService messagingService;
+    private MessagingSendService messagingSendService;
 
     @Autowired
     private FileService fileService;
@@ -55,7 +56,13 @@ public class HelloController {
     @GetMapping("test-endpoint")
     String testEndpoint() throws UnsupportedEncodingException {
         log.info("testEndpoint(). entry");
-        messagingService.send(LongTaskMessage.builder().id(counter++).body("test message with some drop time").spendTime(15L).build());
+        messagingSendService.send(CheckFileTaskMessage
+            .builder()
+            .body(
+                new CheckFileTask()
+                    .withDescription("some text for description, id={"+ (counter++) +"}")
+                    .withPath("C:/"))
+            .build());
         return "Какая то тестовая строка";
     }
 }
